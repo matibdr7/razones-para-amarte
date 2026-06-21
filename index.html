@@ -53,6 +53,15 @@
             Un simple detallito para intentar sacarte una sonrisita cada dia, a pesar de nuestra distancia, espero que te guste mi amorcito, te amo muchisisisisismooo
         </p>
 
+        <!-- Cronómetro para el próximo día habilitado -->
+        <div id="countdownCard" class="mb-10 w-full max-w-3xl rounded-3xl border border-teal-500/30 bg-slate-900/70 px-6 py-5 text-center shadow-xl">
+            <p class="text-sm uppercase tracking-[0.24em] text-teal-200/80 mb-2">Próximo día disponible</p>
+            <div class="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-6">
+                <span id="countdownLabel" class="text-lg text-teal-100 font-medium"></span>
+                <span id="countdownTimer" class="text-4xl md:text-5xl font-serif text-white tracking-[0.35em]"></span>
+            </div>
+        </div>
+
         <!-- Contenedor donde se inyectarán las tarjetas (grilla) -->
         <div id="daysGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
             <!-- Las tarjetas se generan dinámicamente con JavaScript -->
@@ -321,12 +330,64 @@
             requestAnimationFrame(animateStars);
         }
 
+        // Calcula la próxima medianoche local y muestra el día siguiente
+        function getNextUnlockedDayInfo() {
+            const now = new Date();
+            const targetDate = new Date(now);
+            targetDate.setHours(24, 0, 0, 0); // la próxima medianoche local
+
+            const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const nextDayName = dayNames[targetDate.getDay()];
+
+            const lockedDays = daysData.filter(day => !day.isUnlocked);
+            if (lockedDays.length === 0) {
+                return { label: 'Ya está todo desbloqueado', target: null };
+            }
+
+            return {
+                label: `Cuenta regresiva para ${nextDayName} (00:00)`,
+                target: targetDate
+            };
+        }
+
+        function formatCountdown(ms) {
+            if (ms <= 0) return '00:00:00';
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        function updateCountdown() {
+            const countdownLabel = document.getElementById('countdownLabel');
+            const countdownTimer = document.getElementById('countdownTimer');
+            const info = getNextUnlockedDayInfo();
+
+            countdownLabel.textContent = info.label;
+            if (!info.target) {
+                countdownTimer.textContent = '--:--:--';
+                return;
+            }
+
+            const now = new Date();
+            const diff = info.target - now;
+            countdownTimer.textContent = formatCountdown(diff);
+
+            if (diff <= 0) {
+                // Forzar re-render si el día cambió justo a medianoche
+                renderDays();
+            }
+        }
+
         // Iniciar todo al cargar
         window.addEventListener('resize', resizeCanvas);
         window.onload = function() {
             resizeCanvas();
             animateStars();
             renderDays();
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
         };
 
         // Cerrar modal si hacen click fuera de él
