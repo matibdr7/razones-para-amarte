@@ -1,131 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Razones Para Amarte</title>
-    <!-- Cargando Tailwind CSS para los estilos -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Cargando FontAwesome para los íconos (estrellas, candados, whatsapp) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Cargando fuentes románticas de Google -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            /* Un fondo oscuro que combina con tonos turquesa */
-            background: linear-gradient(to bottom, #0f172a, #164e63, #083344);
-            color: white;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        .font-serif {
-            font-family: 'Playfair Display', serif;
-        }
-        
-        /* Animaciones para las tarjetas y el modal */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        .floating {
-            animation: float 4s ease-in-out infinite;
-        }
-        
-        .card-glow:hover {
-            box-shadow: 0 0 25px rgba(45, 212, 191, 0.4);
-        }
-    </style>
-</head>
-<body class="relative">
-    <!-- Modal de Aviso del Helado -->
-    <div id="welcomeModal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300">
-        <div class="bg-slate-900 border border-teal-500/50 rounded-3xl w-full max-w-md p-8 text-center shadow-[0_0_30px_rgba(20,184,166,0.3)] relative transform scale-100 transition-transform duration-300">
-            <button onclick="closeWelcomeModal()" class="absolute top-4 right-4 text-teal-400/60 hover:text-teal-300 text-xl transition-colors">
-                <i class="fa-solid fa-times"></i>
-            </button>
-            <div class="w-16 h-16 mx-auto bg-teal-900/50 rounded-full flex items-center justify-center text-teal-300 mb-6 shadow-[0_0_15px_rgba(45,212,191,0.5)]">
-                <i class="fa-solid fa-ice-cream text-3xl"></i>
-            </div>
-            <h2 class="text-2xl font-serif text-teal-100 mb-4">¡AVISO IMPORTANTE MIVIDA!</h2>
-            <p class="text-teal-50/90 font-light leading-relaxed mb-8">
-                Como no se que rayos vas a hacer con el cupon del helado, queda a tu disposicion, quizas cuando leas esto ya tomaste la decision, pero no puedo poner algo certero aqui porque esto lo estoy programando mas temprano, asi que espero que dissfrutes lo que hayas elegidoo
-            </p>
-            <button onclick="closeWelcomeModal()" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-3 px-8 rounded-full transition-all hover:scale-105 shadow-lg w-full sm:w-auto">
-                Capte la info
-            </button>
-        </div>
-    </div>
 
-    <!-- Canvas para el fondo estrellado -->
-    <canvas id="starsCanvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
-
-    <main class="relative z-10 container mx-auto px-4 py-12 md:py-20 flex flex-col items-center">
-        <!-- Título principal -->
-        <h1 class="text-4xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-teal-200 via-cyan-300 to-teal-400 font-serif text-center mb-4 tracking-wide">
-            7 Días, 7 Razones
-        </h1>
-        <p class="text-teal-100/80 text-lg md:text-xl text-center mb-16 max-w-xl font-light">
-            Un simple detallito para intentar sacarte una sonrisita cada dia, a pesar de nuestra distancia, espero que te guste mi amorcito, te amo muchisisisisismooo
-        </p>
-
-        <!-- Cronómetro para el próximo día habilitado -->
-        <div id="countdownCard" class="mb-10 w-full max-w-3xl rounded-3xl border border-teal-500/30 bg-slate-900/70 px-6 py-5 text-center shadow-xl">
-            <p class="text-sm uppercase tracking-[0.24em] text-teal-200/80 mb-2">Próximo día disponible</p>
-            <div class="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-6">
-                <span id="countdownLabel" class="text-lg text-teal-100 font-medium"></span>
-                <span id="countdownTimer" class="text-4xl md:text-5xl font-serif text-white tracking-[0.35em]"></span>
-            </div>
-        </div>
-
-        <!-- Contenedor donde se inyectarán las tarjetas (grilla) -->
-        <div id="daysGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
-            <!-- Las tarjetas se generan dinámicamente con JavaScript -->
-        </div>
-    </main>
-
-    <!-- Modal (Ventana emergente que se abre al tocar un día) -->
-    <div id="dayModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-slate-900 border border-teal-500/30 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-[0_0_50px_rgba(20,184,166,0.15)] relative flex flex-col transform scale-95 transition-transform duration-300" id="modalContent">
-            
-            <!-- Botón de cerrar -->
-            <button onclick="closeModal()" class="absolute top-5 right-5 text-teal-400/60 hover:text-teal-300 text-2xl z-10 transition-colors">
-                <i class="fa-solid fa-times"></i>
-            </button>
-
-            <div class="p-8 md:p-12 flex flex-col items-center text-center">
-                <!-- Subtítulo (ej. "Domingo") -->
-                <h2 id="modalDayTitle" class="text-teal-400/80 font-serif text-xl md:text-2xl mb-2 italic"></h2>
-                <!-- Título principal de la razón -->
-                <h3 id="modalDate" class="text-white text-3xl md:text-4xl font-serif font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-teal-100 to-teal-300"></h3>
-
-                <!-- Contenedor de la foto estilo Polaroid -->
-                <div class="w-full max-w-sm mb-8 rounded-xl overflow-hidden shadow-2xl shadow-black/50 border-[6px] border-white bg-white p-1 transform rotate-2 transition-transform hover:rotate-0 duration-300">
-                    <img id="modalImage" src="" alt="Nuestra foto" class="w-full h-64 md:h-80 object-cover rounded mb-2">
-                    <p id="modalImageCaption" class="text-slate-800 font-serif text-base italic py-3 bg-white"></p>
-                </div>
-
-                <!-- Texto de la razón -->
-                <div class="relative max-w-lg mx-auto">
-                    <i class="fa-solid fa-quote-left text-3xl text-teal-500/20 absolute -top-4 -left-6"></i>
-                    <p id="modalText" class="text-lg md:text-xl leading-relaxed text-teal-50 font-light whitespace-pre-line"></p>
-                    <i class="fa-solid fa-quote-right text-3xl text-teal-500/20 absolute -bottom-4 -right-6"></i>
-                </div>
-
-                <!-- Botón de Acción (WhatsApp para el regalo) -->
-                <div id="modalActionContainer" class="mt-12 hidden w-full flex justify-center">
-                    <a id="modalActionButton" href="#" target="_blank" class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-white font-medium text-lg transition-all hover:scale-105 shadow-lg w-full sm:w-auto">
-                        <i id="modalActionIcon" class="fa-brands fa-whatsapp text-2xl"></i>
-                        <span id="modalActionText">Botón</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
         // --- CONFIGURACIÓN DE LOS DÍAS ---
         // Aquí puedes cambiar 'isUnlocked' a true para habilitar cada día.
         // También puedes modificar los textos y las URLs de las imágenes.
@@ -170,14 +43,7 @@
                 icon: "fa-people-pulling",
                 text: "Siempre estuviste para mi, apoyandome en todo lo que hacia, siempre estuviste presente ya sea con algun detallito, tu presencia, con tus acciones, siempre me hiciste sentir que no estaba solo y me enseñaste lo  que es el amor incondicional, es algo que destaco siempre que hablo de vos con otras personas y estoy agradecido para siempre. En fin, esta es una de las tantas razones por las que te amo",
                 imageUrl: "fotoMartes.jpg",
-                imageCaption: "Siempre hiciste lo imposible para estar",
-                actionButton: {
-                    text: "Código: TSEADMV (Tocá para guardarlo en tatiesa)",
-                    url: "https://api.whatsapp.com/send?text=¡Holi%20soy%20yo%20jjj%2C%20guarda%20el%20siguiente%20cupon%20TSEADMV%20para%20canjearlo%20por%20un%20regalito%20cuando%20nos%20veamos%2C%20tenes%20que%20ser%20paciente%20ee%2C%20te%20amo%20mucho%2C%20nos%20vemos%20en%20unas%20horitas%20con%20la%20siguiente%20razon%20por%20la%20que%20te%20amo%20%E2%9D%A4%EF%B8%8F",
-                    icon: "fa-ticket",
-                    // Un color dorado/naranja degradado para que parezca un ticket real
-                    colorClass: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-[0_0_20px_rgba(245,158,11,0.4)]"
-                }
+                imageCaption: "Siempre hiciste lo imposible para estar"
             },
             {
                 id: 4,
@@ -234,17 +100,51 @@
         const grid = document.getElementById('daysGrid');
         const modal = document.getElementById('dayModal');
         const modalContent = document.getElementById('modalContent');
+        const bodyElement = document.body;
+        const themeState = { current: null };
+
+        function getThemeMode() {
+            const hour = new Date().getHours();
+            return hour >= 7 && hour <= 19 ? 'day' : 'night';
+        }
+
+        function getThemeAccent() {
+            return themeState.current === 'day'
+                ? { badgeBg: 'bg-[#f7c46c]/20', badgeText: 'text-[#9a590f]', infoText: 'text-[#7a4b0d]' }
+                : { badgeBg: 'bg-teal-900/50', badgeText: 'text-teal-300', infoText: 'text-teal-300' };
+        }
+
+        function applyTheme(mode) {
+            if (themeState.current === mode) return;
+            themeState.current = mode;
+            bodyElement.classList.remove('theme-day', 'theme-night');
+            bodyElement.classList.add(`theme-${mode}`);
+            document.getElementById('mainTitle').classList.add('theme-heading');
+            document.getElementById('mainSubtitle').classList.add('theme-subtitle');
+            document.getElementById('countdownCard').classList.add('theme-panel');
+            modalContent.classList.add('theme-modal');
+            document.getElementById('modalDayTitle').classList.add('theme-subtitle');
+            document.getElementById('modalDate').classList.add('theme-heading');
+            document.querySelectorAll('.quote-icon').forEach(el => el.classList.add('theme-quote'));
+            initStars();
+            if (grid.children.length > 0) renderDays();
+        }
+
+        function checkThemeChange() {
+            applyTheme(getThemeMode());
+        }
 
         // Renderizar las tarjetas
         function renderDays() {
             grid.innerHTML = '';
             daysData.forEach((day, index) => {
                 const isLocked = !day.isUnlocked;
+                const accent = getThemeAccent();
                 // Retraso de animación para efecto en cascada
                 const animationDelay = index * 0.1;
                 
                 const card = document.createElement('div');
-                card.className = `relative rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all duration-300 ${isLocked ? 'bg-slate-800/50 border border-slate-700 opacity-70 grayscale-[50%]' : 'bg-slate-800/80 border border-teal-500/40 cursor-pointer card-glow hover:-translate-y-2 floating'}`;
+                card.className = `relative rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all duration-300 theme-card ${isLocked ? 'theme-card-locked' : 'theme-card theme-card-active cursor-pointer card-glow hover:-translate-y-2 floating'}`;
                 card.style.animationDelay = `${animationDelay}s`;
                 
                 if (!isLocked) {
@@ -252,11 +152,11 @@
                 }
 
                 card.innerHTML = `
-                    <div class="w-16 h-16 rounded-full mb-4 flex items-center justify-center ${isLocked ? 'bg-slate-700 text-slate-500' : 'bg-teal-900/50 text-teal-300 shadow-[0_0_15px_rgba(45,212,191,0.5)]'}">
+                    <div class="w-16 h-16 rounded-full mb-4 flex items-center justify-center ${isLocked ? 'bg-slate-700 text-slate-500' : `${accent.badgeBg} ${accent.badgeText} shadow-[0_0_15px_rgba(255,171,51,0.2)]`}">
                         <i class="fa-solid ${isLocked ? 'fa-lock' : day.icon} text-2xl"></i>
                     </div>
-                    <h3 class="text-xl font-serif text-teal-50 mb-1">${day.dayName}</h3>
-                    <p class="text-sm ${isLocked ? 'text-slate-500' : 'text-teal-300 font-medium'}">
+                    <h3 class="text-xl font-serif mb-1" style="color: var(--text-primary);">${day.dayName}</h3>
+                    <p class="text-sm ${isLocked ? 'text-[#94a3b8]' : `${accent.infoText} font-medium`}">
                         ${isLocked ? 'Todavia no e, confianzuuda, pasiensia pasiensa' : '¡Toca para abrir!'}
                     </p>
                 `;
@@ -305,15 +205,7 @@
                 modalContent.classList.add('scale-100');
             }, 10);
         }
-        
-        function closeWelcomeModal() {
-            const wModal = document.getElementById('welcomeModal');
-            wModal.classList.add('opacity-0');
-            setTimeout(() => {
-                wModal.classList.add('hidden');
-            }, 300);
-        }
-        
+
         function closeModal() {
             modal.classList.add('opacity-0');
             modalContent.classList.remove('scale-100');
@@ -351,9 +243,36 @@
 
         function animateStars() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+            const isDay = themeState.current === 'day';
+
+            if (isDay) {
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, '#fff8e1');
+                gradient.addColorStop(1, '#ffd39e');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Sol suave en la esquina superior derecha
+                const sunX = canvas.width * 0.85;
+                const sunY = canvas.height * 0.18;
+                const sunRadius = Math.min(canvas.width, canvas.height) * 0.12;
+                const sunGradient = ctx.createRadialGradient(sunX, sunY, sunRadius * 0.1, sunX, sunY, sunRadius);
+                sunGradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+                sunGradient.addColorStop(0.6, 'rgba(255, 223, 125, 0.6)');
+                sunGradient.addColorStop(1, 'rgba(255, 149, 58, 0.0)');
+                ctx.fillStyle = sunGradient;
+                ctx.beginPath();
+                ctx.arc(sunX, sunY, sunRadius, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, '#081426');
+                gradient.addColorStop(1, '#0b2a47');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
             stars.forEach(star => {
-                // Hacer que titilen
                 star.alpha += star.speed;
                 if (star.alpha > 1 || star.alpha < 0) {
                     star.speed = -star.speed;
@@ -362,9 +281,10 @@
                 ctx.beginPath();
                 ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
                 ctx.fillStyle = star.color;
-                ctx.globalAlpha = Math.abs(star.alpha);
+                ctx.globalAlpha = Math.abs(star.alpha) * (themeState.current === 'day' ? 0.75 : 1);
                 ctx.fill();
             });
+            ctx.globalAlpha = 1;
             
             requestAnimationFrame(animateStars);
         }
@@ -423,10 +343,12 @@
         window.addEventListener('resize', resizeCanvas);
         window.onload = function() {
             resizeCanvas();
+            checkThemeChange();
             animateStars();
             renderDays();
             updateCountdown();
             setInterval(updateCountdown, 1000);
+            setInterval(checkThemeChange, 60000);
         };
 
         // Cerrar modal si hacen click fuera de él
@@ -434,6 +356,4 @@
             if (e.target === modal) closeModal();
         });
 
-    </script>
-</body>
-</html>
+    
