@@ -40,7 +40,8 @@
     </style>
 </head>
 <body class="relative">
-    <!-- Modal de Aviso del Helado -->
+    <!-- Modal de Aviso Por si la necesito -->
+    <!--
     <div id="welcomeModal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-slate-900 border border-teal-500/50 rounded-3xl w-full max-w-md p-8 text-center shadow-[0_0_30px_rgba(20,184,166,0.3)] relative transform scale-100 transition-transform duration-300">
             <button onclick="closeWelcomeModal()" class="absolute top-4 right-4 text-teal-400/60 hover:text-teal-300 text-xl transition-colors">
@@ -56,8 +57,9 @@
             <button onclick="closeWelcomeModal()" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-3 px-8 rounded-full transition-all hover:scale-105 shadow-lg w-full sm:w-auto">
                 Capte la info
             </button>
-        </div>
+        </div>  
     </div>
+    -->
 
     <!-- Canvas para el fondo estrellado -->
     <canvas id="starsCanvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
@@ -184,10 +186,10 @@
                 dayName: "Miércoles",
                 title: "Razon Miercoles",
                 isUnlocked: false,
-                icon: "fa-music",
-                text: "Amo nuestras charlas interminables, nuestras bromas internas y cómo parecemos leernos la mente. La conexión que tenemos es única y no la cambiaría por nada del mundo.",
-                imageUrl: "https://placehold.co/600x600/0097A7/FFFFFF?text=Foto+Miercoles",
-                imageCaption: "Nuestras locuras"
+                icon: "fa-solid fa-gem",
+                text: "Desde el comienzo, con cada uno de tus detallitos, de tus ocurrencias me hiciste sentir especial de a poco, desde cada cumpleaños a dias normales, siempre hacias algo que poco a poco me hicieron sentirme amado y entender que el amor que vos me dabas era real y que era lo que queria para mi, siendo yo alguien que normalmente no esperaba cositas asi, en fin, gracias por todo lo que me diste y me das, te amo muchisisisimo mi vida",
+                imageUrl: "fotoMiercoles.jpg",
+                imageCaption: "Siempre se te ocurrian de estas cositas (nunca supe como reaccionar pero las amaba jj)",
             },
             {
                 id: 5,
@@ -306,7 +308,7 @@
             }, 10);
         }
         
-        function closeWelcomeModal() {
+        function closeWelcomeModal() { //ESTA FUNCION LA DEJO PQ SINO SE ROMPE TODO YA VOY A VER Q ONDA
             const wModal = document.getElementById('welcomeModal');
             wModal.classList.add('opacity-0');
             setTimeout(() => {
