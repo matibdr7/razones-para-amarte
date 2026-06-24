@@ -123,6 +123,8 @@
                         <span id="modalActionText">Botón</span>
                     </a>
                 </div>
+                <div id="modalBenefitText" class="mt-4 hidden max-w-2xl rounded-3xl border border-teal-500/30 bg-slate-900/80 px-5 py-4 text-sm text-teal-100/90 shadow-[0_0_20px_rgba(14,165,233,0.12)]">
+                </div>
             </div>
         </div>
     </div>
@@ -190,6 +192,7 @@
                 text: "Desde el comienzo, con cada uno de tus detallitos, de tus ocurrencias me hiciste sentir especial de a poco, desde cada cumpleaños a dias normales, siempre hacias algo que poco a poco me hicieron sentirme amado y entender que el amor que vos me dabas era real y que era lo que queria para mi, siendo yo alguien que normalmente no esperaba cositas asi, en fin, gracias por todo lo que me diste y me das, te amo muchisisisimo mi vida",
                 imageUrl: "fotoMiercoles.jpg",
                 imageCaption: "Siempre se te ocurrian de estas cositas (nunca supe como reaccionar pero las amaba jj)",
+                benefitText: "El cupón de hoy es el beneficio de elegir la próxima peli que vamos a ver (o un video si preferís), de la duración que quieras. Se puede canjear por lo que vos quieras para nuestro próximo rato juntos.",
             },
             {
                 id: 5,
@@ -297,6 +300,14 @@
             } else {
                 actionContainer.classList.add('hidden');
                 actionContainer.classList.remove('flex');
+            }
+
+            const benefitTextEl = document.getElementById('modalBenefitText');
+            if (day.benefitText) {
+                benefitTextEl.innerText = day.benefitText;
+                benefitTextEl.classList.remove('hidden');
+            } else {
+                benefitTextEl.classList.add('hidden');
             }
 
             // Mostrar el modal con animación suave
