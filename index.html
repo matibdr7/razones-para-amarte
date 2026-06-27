@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Cargando fuentes románticas de Google -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     
     <style>
         body {
@@ -132,13 +131,10 @@
                         <i class="fa-solid fa-ticket text-lg"></i>
                         <span class="text-sm font-semibold uppercase tracking-[0.2em]">Cupón comodín</span>
                     </div>
-                    <div id="couponPreviewCard" class="rounded-2xl border border-dashed border-amber-200/50 bg-white/95 p-4 text-slate-900">
+                    <div class="rounded-2xl border border-dashed border-amber-200/50 bg-white/95 p-4 text-slate-900">
                         <p class="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-amber-600">Tu cupón</p>
-                        <textarea id="couponInput" rows="4" maxlength="180" class="w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-800 outline-none focus:border-amber-500" placeholder="Escribí lo que quieras pedir, un favor, un plan o un beneficio para vos..."></textarea>
-                        <div class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <p id="couponStatus" class="text-xs text-slate-600">Escribí lo que quieras y se activará automáticamente.</p>
-                            <button id="couponShareButton" type="button" class="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500">Enviar por WhatsApp</button>
-                        </div>
+                        <textarea id="couponInput" rows="4" maxlength="180" class="w-full rounded-xl border border-slate-300 p-3 text-sm text-slate-800 outline-none focus:border-amber-500" placeholder="Escribí el tatibeneficio que quieras aquí..."></textarea>
+                        <p class="mt-3 text-xs text-slate-500">Escribí el tatibeneficio que quieras. Sacale screenshot a este cupón y mandámelo por WhatsApp cuando quieras.</p>
                     </div>
                 </div>
             </div>
@@ -253,8 +249,7 @@
                 imageUrl: "imagenSabado.jpeg",
                 imageCaption: "foto iconicc pero ahi si me sentia en casita jj",
                 coupon: {
-                    storageKey: "couponComodinState",
-                    placeholder: "Escribí l tatibeneficio que vos quieras y lo podes usar cuando quieras"
+                    placeholder: "Escribí el tatibeneficio que quieras aquí y sacale screenshot para mandármelo por wpp."
                 }
             },
             {
@@ -274,99 +269,6 @@
         const modalContent = document.getElementById('modalContent');
         const couponContainer = document.getElementById('modalCouponContainer');
         const couponInput = document.getElementById('couponInput');
-        const couponStatus = document.getElementById('couponStatus');
-        const couponShareButton = document.getElementById('couponShareButton');
-        const couponPreviewCard = document.getElementById('couponPreviewCard');
-
-        function readCouponState(storageKey) {
-            try {
-                const saved = localStorage.getItem(storageKey);
-                if (!saved) return { text: '', isActive: false };
-                const parsed = JSON.parse(saved);
-                return {
-                    text: parsed?.text || '',
-                    isActive: Boolean(parsed?.isActive)
-                };
-            } catch (error) {
-                return { text: '', isActive: false };
-            }
-        }
-
-        function writeCouponState(storageKey, state) {
-            localStorage.setItem(storageKey, JSON.stringify(state));
-        }
-
-        function syncCouponUi(storageKey) {
-            const state = readCouponState(storageKey);
-            couponInput.value = state.text;
-            couponInput.placeholder = 'Escribí lo que quieras pedir, un favor, un plan o un beneficio para vos...';
-
-            if (state.isActive) {
-                couponStatus.textContent = 'Tu cupón está listo y se activó al escribir.';
-                couponStatus.className = 'text-xs text-emerald-700';
-            } else {
-                couponStatus.textContent = 'Escribí lo que quieras y se activará automáticamente.';
-                couponStatus.className = 'text-xs text-slate-600';
-            }
-        }
-
-        function persistCouponText(storageKey) {
-            const text = couponInput.value.trim();
-            writeCouponState(storageKey, {
-                text,
-                isActive: text.length > 0
-            });
-            syncCouponUi(storageKey);
-        }
-
-        couponInput.addEventListener('input', () => {
-            const activeDay = daysData.find(day => day.coupon);
-            if (!activeDay?.coupon?.storageKey) return;
-            persistCouponText(activeDay.coupon.storageKey);
-        });
-
-        couponShareButton.addEventListener('click', async () => {
-            const activeDay = daysData.find(day => day.coupon);
-            if (!activeDay?.coupon?.storageKey) return;
-
-            const state = readCouponState(activeDay.coupon.storageKey);
-            if (!state.text) {
-                couponStatus.textContent = 'Escribí algo primero para poder enviarlo.';
-                couponStatus.className = 'text-xs text-amber-700';
-                return;
-            }
-
-            try {
-                if (window.html2canvas && couponPreviewCard) {
-                    const canvas = await window.html2canvas(couponPreviewCard, {
-                        backgroundColor: '#ffffff',
-                        scale: 2
-                    });
-                    const dataUrl = canvas.toDataURL('image/png');
-                    const response = await fetch(dataUrl);
-                    const blob = await response.blob();
-                    const file = new File([blob], 'cupon-comodin.png', { type: 'image/png' });
-
-                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            title: 'Cupón comodín',
-                            text: `Cupón comodín activado:\n${state.text}`,
-                            files: [file]
-                        });
-                        couponStatus.textContent = 'Se compartió el cupón.';
-                        couponStatus.className = 'text-xs text-emerald-700';
-                        return;
-                    }
-                }
-            } catch (error) {
-                console.error('No se pudo generar la captura del cupón:', error);
-            }
-
-            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Cupón comodín activado:\n${state.text}`)}`;
-            window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-            couponStatus.textContent = 'Se abrió WhatsApp para compartir el cupón.';
-            couponStatus.className = 'text-xs text-emerald-700';
-        });
 
         // Renderizar las tarjetas
         function renderDays() {
@@ -438,9 +340,9 @@
                 benefitTextEl.classList.add('hidden');
             }
 
-            if (day.coupon?.storageKey) {
+            if (day.coupon) {
                 couponContainer.classList.remove('hidden');
-                syncCouponUi(day.coupon.storageKey);
+                couponInput.placeholder = day.coupon.placeholder || 'Escribí el tatibeneficio que quieras aquí...';
             } else {
                 couponContainer.classList.add('hidden');
             }
