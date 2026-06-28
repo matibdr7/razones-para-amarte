@@ -198,12 +198,13 @@
                 id: 8, 
                 dayName: "Domingo", 
                 title: "Porque sos el amor de mi vida", 
-                isUnlocked: false, 
+                isUnlocked: true, 
                 isSpecial: true, 
                 icon: "fa-heart", 
                 text: "Llegamos al final de esta semanita mivida. Y de todas las razones que te di, esta es la más fuerte y la más real te amo porque sos el amor de mi vida. Quizas seguimos siendo chicos como para adelantarnos tanto y todavia nos falta vivir mucho pero por todo lo que te conozco hasta hoy, quiero que seas vos\n\nPorque con nuestras cosas buenas y nuestras cosas malas encajás perfecto conmigo. Porque pensar en mi futuro es imaginarte a vos al lado mío o logrando cosas con vos al lado mio. Gracias por ser siemmpre mi compañera incondicional, mi lugar seguro y muchas veces mi razon para estar feli.\n\nPorque a pesar de todos los obstaculos que tuvimos y de la distancia actual, a pesar de miles de cosas, seguimos aqui juntitos intentando lograr algo entre nosotros.\n\nTe digo que quiero que seas vos y te elijo hoy y te quiero a elegir todos los días de mi vida. y preparate, porque cuando estos 300km se hagan 0 porfin, te voy a llenar de besos, abrazos, y todo lo que vos quieras.\n\nTe amo infinitamente con tooodo mi corazoncito. Siempre tuyo. Tu Mati",
                 imageUrl: "fotoDomingo.png", 
-                imageCaption: "Te elijo hoy y todos los días de mi vida."
+                imageCaption: "Te elijo hoy y todos los días de mi vida.",
+                actionButton: { text: "Cuponcito para cambiar por picnic juntitos", url: "https://api.whatsapp.com/send?text=Cupon%20para%20cambiar%20por%20una%20tardecita%20de%20picnic%20%F0%9F%A7%BA%E2%98%80%EF%B8%8F%F0%9F%92%95", icon: "fa-whatsapp", colorClass: "bg-[#25D366] hover:bg-[#128C7E] shadow-[0_0_20px_rgba(37,211,102,0.4)]" }
             }
         ];
 
@@ -288,7 +289,7 @@
             }
         }
 
-        function startTypewriter(text, elementId, speed = 45) {
+        function startTypewriter(text, elementId, speed = 45, onComplete = null) {
             const el = document.getElementById(elementId);
             el.innerText = '';
             el.classList.add('typing-cursor');
@@ -301,8 +302,25 @@
                 } else {
                     clearInterval(typeWriterInterval);
                     el.classList.remove('typing-cursor');
+                    if (onComplete) onComplete();
                 }
             }, speed);
+        }
+
+        function renderActionButton(day) {
+            const actionContainer = document.getElementById('modalActionContainer');
+            if (day.actionButton) {
+                const actionBtn = document.getElementById('modalActionButton');
+                actionBtn.href = day.actionButton.url;
+                actionBtn.className = `inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-white font-medium text-lg transition-all hover:scale-105 shadow-lg w-full sm:w-auto ${day.actionButton.colorClass}`;
+                document.getElementById('modalActionText').innerText = day.actionButton.text;
+                document.getElementById('modalActionIcon').className = `fa-brands ${day.actionButton.icon} text-2xl`;
+                actionContainer.classList.remove('hidden');
+                actionContainer.classList.add('flex');
+            } else {
+                actionContainer.classList.add('hidden');
+                actionContainer.classList.remove('flex');
+            }
         }
 
         function openModal(dayId) {
@@ -334,27 +352,20 @@
 
                 document.getElementById('modalText').innerText = ''; 
                 setTimeout(() => {
-                    startTypewriter(day.text, 'modalText', 45); 
+                    startTypewriter(day.text, 'modalText', 45, () => {
+                        renderActionButton(day);
+                    }); 
                 }, 500);
 
             } else {
                 setRomanticTheme(false);
                 document.getElementById('modalText').innerText = day.text;
+                renderActionButton(day);
             }
 
             const actionContainer = document.getElementById('modalActionContainer');
-            if (day.actionButton) {
-                const actionBtn = document.getElementById('modalActionButton');
-                actionBtn.href = day.actionButton.url;
-                actionBtn.className = `inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-white font-medium text-lg transition-all hover:scale-105 shadow-lg w-full sm:w-auto ${day.actionButton.colorClass}`;
-                document.getElementById('modalActionText').innerText = day.actionButton.text;
-                document.getElementById('modalActionIcon').className = `fa-brands ${day.actionButton.icon} text-2xl`;
-                actionContainer.classList.remove('hidden');
-                actionContainer.classList.add('flex');
-            } else {
-                actionContainer.classList.add('hidden');
-                actionContainer.classList.remove('flex');
-            }
+            actionContainer.classList.add('hidden');
+            actionContainer.classList.remove('flex');
 
             const benefitTextEl = document.getElementById('modalBenefitText');
             if (day.benefitText) {
