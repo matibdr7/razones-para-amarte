@@ -6,25 +6,28 @@
     <title>Razones Para Amarte</title>
     <!-- Cargando Tailwind CSS para los estilos -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Cargando FontAwesome para los íconos (estrellas, candados, whatsapp) -->
+    <!-- Cargando FontAwesome para los íconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Cargando fuentes románticas de Google -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Librería para la explosión de confeti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* Un fondo oscuro que combina con tonos turquesa */
-            background: linear-gradient(to bottom, #0f172a, #164e63, #083344);
+            /* FONDO: AMANECER */
+            background: linear-gradient(to bottom, #0f172a 0%, #4c1d95 35%, #be185d 70%, #f59e0b 100%);
+            background-attachment: fixed; 
             color: white;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background 1.5s ease-in-out;
         }
         .font-serif {
             font-family: 'Playfair Display', serif;
         }
         
-        /* Animaciones para las tarjetas y el modal */
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
@@ -37,12 +40,24 @@
         .card-glow:hover {
             box-shadow: 0 0 25px rgba(45, 212, 191, 0.4);
         }
+
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
     </style>
 </head>
 <body class="relative">
+
+    <!-- Audio Oculto para "With You" -->
+    <audio id="bgMusic" src="jimin.mp3" preload="auto"></audio>
+
     <!-- Modal de Aviso Por si la necesito -->
-    <div id="welcomeModal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-300">
-        <div class="bg-slate-900 border border-teal-500/50 rounded-3xl w-full max-w-md p-8 text-center shadow-[0_0_30px_rgba(20,184,166,0.3)] relative transform scale-100 transition-transform duration-300">
+    <div id="welcomeModal" class="fixed inset-0 z-[60] hidden bg-black/80 backdrop-blur-md items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-slate-900 border border-teal-500/50 rounded-3xl w-full max-w-md p-8 text-center shadow-[0_0_30px_rgba(20,184,166,0.3)] relative transform scale-95 transition-transform duration-300" id="welcomeModalContent">
             <button onclick="closeWelcomeModal()" class="absolute top-4 right-4 text-teal-400/60 hover:text-teal-300 text-xl transition-colors">
                 <i class="fa-solid fa-times"></i>
             </button>
@@ -51,7 +66,7 @@
             </div>
             <h2 class="text-2xl font-serif text-teal-100 mb-4">¡AVISO IMPORTANTE MIVIDA!</h2>
             <p class="text-teal-50/90 font-light leading-relaxed mb-8">
-                Holi mi vida, primero que nada mil disculpas aqui deberia haber un dia Domingo pero por problemillas tecnicos el domingo se va a demorar un poquito, pero seras recompensada, se disculpa todo el equipo tecnico pero no puedo despedir a ninguno porque (Somos 1). Muchas gracias por su comprension y paciencia, te amo muchisimo
+                Holi mi vida, primero que nada mil disculpas aqui deberia haber un dia Domingo pero por problemillas tecnicos el domingo se va a demorar un poquito...
             </p>    
             <button onclick="closeWelcomeModal()" class="bg-teal-600 hover:bg-teal-500 text-white font-medium py-3 px-8 rounded-full transition-all hover:scale-105 shadow-lg w-full sm:w-auto">
                 Okiii   
@@ -59,20 +74,20 @@
         </div>  
     </div>
 
-    <!-- Canvas para el fondo estrellado -->
+    <!-- Canvas para el fondo de amanecer mágico -->
     <canvas id="starsCanvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
 
     <main class="relative z-10 container mx-auto px-4 py-12 md:py-20 flex flex-col items-center">
         <!-- Título principal -->
-        <h1 class="text-4xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-teal-200 via-cyan-300 to-teal-400 font-serif text-center mb-4 tracking-wide">
+        <h1 class="text-4xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-teal-100 via-cyan-200 to-teal-300 font-serif text-center mb-4 tracking-wide drop-shadow-lg">
             7 Días, 7 Razones
         </h1>
-        <p class="text-teal-100/80 text-lg md:text-xl text-center mb-16 max-w-xl font-light">
+        <p class="text-teal-50/90 text-lg md:text-xl text-center mb-16 max-w-xl font-light">
             Un simple detallito para intentar sacarte una sonrisita cada dia, a pesar de nuestra distancia, espero que te guste mi amorcito, te amo muchisisisisismooo
         </p>
 
         <!-- Cronómetro para el próximo día habilitado -->
-        <div id="countdownCard" class="mb-10 w-full max-w-3xl rounded-3xl border border-teal-500/30 bg-slate-900/70 px-6 py-5 text-center shadow-xl">
+        <div id="countdownCard" class="mb-10 w-full max-w-3xl rounded-3xl border border-teal-500/30 bg-slate-900/70 backdrop-blur-sm px-6 py-5 text-center shadow-xl transition-colors duration-500">
             <p class="text-sm uppercase tracking-[0.24em] text-teal-200/80 mb-2">Próximo día disponible</p>
             <div class="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-6">
                 <span id="countdownLabel" class="text-lg text-teal-100 font-medium"></span>
@@ -88,33 +103,27 @@
 
     <!-- Modal (Ventana emergente que se abre al tocar un día) -->
     <div id="dayModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-slate-900 border border-teal-500/30 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-[0_0_50px_rgba(20,184,166,0.15)] relative flex flex-col transform scale-95 transition-transform duration-300" id="modalContent">
+        <div class="bg-slate-900 border border-teal-500/30 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-[0_0_50px_rgba(20,184,166,0.15)] relative flex flex-col transform scale-95 transition-all duration-700" id="modalContent">
             
-            <!-- Botón de cerrar -->
-            <button onclick="closeModal()" class="absolute top-5 right-5 text-teal-400/60 hover:text-teal-300 text-2xl z-10 transition-colors">
+            <button onclick="closeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white text-2xl z-10 transition-colors">
                 <i class="fa-solid fa-times"></i>
             </button>
 
             <div class="p-8 md:p-12 flex flex-col items-center text-center">
-                <!-- Subtítulo (ej. "Domingo") -->
-                <h2 id="modalDayTitle" class="text-teal-400/80 font-serif text-xl md:text-2xl mb-2 italic"></h2>
-                <!-- Título principal de la razón -->
-                <h3 id="modalDate" class="text-white text-3xl md:text-4xl font-serif font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-teal-100 to-teal-300"></h3>
+                <h2 id="modalDayTitle" class="text-gray-400 font-serif text-xl md:text-2xl mb-2 italic"></h2>
+                <h3 id="modalDate" class="text-white text-3xl md:text-4xl font-serif font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-teal-100 to-teal-300 transition-colors duration-500"></h3>
 
-                <!-- Contenedor de la foto estilo Polaroid -->
-                <div class="w-full max-w-sm mb-8 rounded-xl overflow-hidden shadow-2xl shadow-black/50 border-[6px] border-white bg-white p-1 transform rotate-2 transition-transform hover:rotate-0 duration-300">
+                <div id="polaroidFrame" class="w-full max-w-sm mb-8 rounded-xl overflow-hidden shadow-2xl shadow-black/50 border-[6px] border-white bg-white p-1 transform rotate-2 transition-all hover:rotate-0 duration-500">
                     <img id="modalImage" src="" alt="Nuestra foto" class="w-full h-64 md:h-80 object-cover rounded mb-2">
                     <p id="modalImageCaption" class="text-slate-800 font-serif text-base italic py-3 bg-white"></p>
                 </div>
 
-                <!-- Texto de la razón -->
-                <div class="relative max-w-lg mx-auto">
-                    <i class="fa-solid fa-quote-left text-3xl text-teal-500/20 absolute -top-4 -left-6"></i>
+                <div class="relative max-w-lg mx-auto w-full text-left md:text-center">
+                    <i class="fa-solid fa-quote-left text-3xl text-teal-500/20 absolute -top-4 -left-6 transition-colors duration-500 quote-icon"></i>
                     <p id="modalText" class="text-lg md:text-xl leading-relaxed text-teal-50 font-light whitespace-pre-line"></p>
-                    <i class="fa-solid fa-quote-right text-3xl text-teal-500/20 absolute -bottom-4 -right-6"></i>
+                    <i class="fa-solid fa-quote-right text-3xl text-teal-500/20 absolute -bottom-4 -right-6 transition-colors duration-500 quote-icon"></i>
                 </div>
 
-                <!-- Botón de Acción (WhatsApp para el regalo) -->
                 <div id="modalActionContainer" class="mt-12 hidden w-full flex justify-center">
                     <a id="modalActionButton" href="#" target="_blank" class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-white font-medium text-lg transition-all hover:scale-105 shadow-lg w-full sm:w-auto">
                         <i id="modalActionIcon" class="fa-brands fa-whatsapp text-2xl"></i>
@@ -141,124 +150,60 @@
 
     <script>
         // --- CONFIGURACIÓN DE LOS DÍAS ---
-        // Aquí puedes cambiar 'isUnlocked' a true para habilitar cada día.
-        // También puedes modificar los textos y las URLs de las imágenes.
         const daysData = [
             {
-                id: 1,
-                dayName: "Domingo (la previa)",
-                title: "¡Bienvenida a nuestra semana!",
-                isUnlocked: true, // ¡Hoy es el único desbloqueado!
-                icon: "fa-gift", // Ícono especial por ser sorpresa
+                id: 1, dayName: "Domingo (la previa)", title: "¡Bienvenida a nuestra semana!", isUnlocked: true, icon: "fa-gift",
                 text: "Holi mi vida, hice este jueguito simple para ponerle un toquecito de amor a la semana, consiste en que cada dia de la semana vas a ir desbloqueando razones que tengo para amarte, espero disfrutes la dinamica, TE AMOOO. Hoy es dominguito y no podes terminar la semana sin tomar tu heladito semanal asi que aqui lo podes reclamar",
-                imageUrl: "imagenDomingo.jpeg", 
-                imageCaption: " ÑAAAMMMM 🍦",
-                actionButton: {
-                    text: "Y que viva el helado de los findes!",
-                    url: "https://api.whatsapp.com/send?text=Hola%20bro,%20quiero%20desbloquear%20mi%20heladito%20e%20🍧",
-                    icon: "fa-whatsapp",
-                    colorClass: "bg-[#25D366] hover:bg-[#128C7E] shadow-[0_0_20px_rgba(37,211,102,0.4)]"
-                }
+                imageUrl: "imagenDomingo.jpeg", imageCaption: " ÑAAAMMMM 🍦",
+                actionButton: { text: "Y que viva el helado de los findes!", url: "https://api.whatsapp.com/send?text=Hola%20bro,%20quiero%20desbloquear%20mi%20heladito%20e%20🍧", icon: "fa-whatsapp", colorClass: "bg-[#25D366] hover:bg-[#128C7E] shadow-[0_0_20px_rgba(37,211,102,0.4)]" }
             },
             {
-                id: 2,
-                dayName: "Lunes",
-                title: "Tu sonrisita hermosa",
-                isUnlocked: true, // Bloqueado por ahora
-                icon: "fa-star",
+                id: 2, dayName: "Lunes", title: "Tu sonrisita hermosa", isUnlocked: true, icon: "fa-star",
                 text: "Tu sonrisa tiene algo magico y siempre lo voy a pensar, y en este tiempito que estamos pasando mas me mueve tu sonrisa y es lo unico que busco cada dia, on cada videollamada, con cada plancito que hacemos, con cada mensajito, busco verte sonreir y ser feliz un 1% de lo feliz que me haces todos los dias a mi, te amo mucho mi vida, este es solo un comiencito de la semana, espero que te guste. Como ayer no pudiste pedir tu heladito, el premio es valido tambien hoy. TE AMOOO",
-                imageUrl: "fotoLunes.jpeg",
-                imageCaption: "Tu sonrisa mágica",
-                actionButton: {
-                    text: "Pedir heladito atrasado hoy \n (disponible a partir de las 10:00hs)🍦",
-                    url: "https://api.whatsapp.com/send?text=Hola%20amor%2C%20quiero%20mi%20helado%20de%20hoy%20%F0%9F%8D%A7",
-                    icon: "fa-whatsapp",
-                    colorClass: "bg-[#25D366] hover:bg-[#128C7E] shadow-[0_0_20px_rgba(37,211,102,0.4)]"
-                }
+                imageUrl: "fotoLunes.jpeg", imageCaption: "Tu sonrisa mágica",
+                actionButton: { text: "Pedir heladito atrasado hoy 🍦", url: "https://api.whatsapp.com/send?text=Hola%20amor%2C%20quiero%20mi%20helado%20de%20hoy%20%F0%9F%8D%A7", icon: "fa-whatsapp", colorClass: "bg-[#25D366] hover:bg-[#128C7E] shadow-[0_0_20px_rgba(37,211,102,0.4)]" }
             },
             {
-                id: 3,
-                dayName: "Martes",
-                title: "Por ser mi compañera incondicional",
-                isUnlocked: true,
-                icon: "fa-people-pulling",
-                text: "Siempre estuviste para mi, apoyandome en todo lo que hacia, siempre estuviste presente ya sea con algun detallito, tu presencia, con tus acciones, siempre me hiciste sentir que no estaba solo y me enseñaste lo  que es el amor incondicional, es algo que destaco siempre que hablo de vos con otras personas y estoy agradecido para siempre. En fin, esta es una de las tantas razones por las que te amo",
-                imageUrl: "fotoMartes.jpg",
-                imageCaption: "Siempre hiciste lo imposible para estar",
-                actionButton: {
-                    text: "Código: TSEADMV (Tocá para guardarlo en tatiesa)",
-                    url: "https://api.whatsapp.com/send?text=¡Holi%20soy%20yo%20jjj%2C%20guarda%20el%20siguiente%20cupon%20TSEADMV%20para%20canjearlo%20por%20un%20regalito%20cuando%20nos%20veamos%2C%20tenes%20que%20ser%20paciente%20ee%2C%20te%20amo%20mucho%2C%20nos%20vemos%20en%20unas%20horitas%20con%20la%20siguiente%20razon%20por%20la%20que%20te%20amo%20%E2%9D%A4%EF%B8%8F",
-                    icon: "fa-ticket",
-                    // Un color dorado/naranja degradado para que parezca un ticket real
-                    colorClass: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-[0_0_20px_rgba(245,158,11,0.4)]"
-                }
+                id: 3, dayName: "Martes", title: "Por ser mi compañera incondicional", isUnlocked: true, icon: "fa-people-pulling",
+                text: "Siempre estuviste para mi, apoyandome en todo lo que hacia, siempre estuviste presente ya sea con algun detallito, tu presencia, con tus acciones, siempre me hiciste sentir que no estaba solo y me enseñaste lo que es el amor incondicional. En fin, esta es una de las tantas razones por las que te amo.",
+                imageUrl: "fotoMartes.jpg", imageCaption: "Siempre hiciste lo imposible para estar",
+                actionButton: { text: "Código: TSEADMV (Guardarlo)", url: "https://api.whatsapp.com/send?text=¡Holi%20soy%20yo%20jjj%2C%20guarda%20el%20siguiente%20cupon%20TSEADMV", icon: "fa-ticket", colorClass: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-[0_0_20px_rgba(245,158,11,0.4)]" }
             },
             {
-                id: 4,
-                dayName: "Miércoles",
-                title: "Por hacerme sentir especial",
-                isUnlocked: true,
-                icon: "fa-solid fa-gem",
-                text: "Desde el comienzo, con cada uno de tus detallitos, de tus ocurrencias me hiciste sentir especial de a poco, desde cada cumpleaños a dias normales, siempre hacias algo que poco a poco me hicieron sentirme amado y entender que el amor que vos me dabas era real y que era lo que queria para mi, siendo yo alguien que normalmente no esperaba cositas asi, en fin, gracias por todo lo que me diste y me das, te amo muchisisisimo mi vida",
-                imageUrl: "fotoMiercoles.jpg",
-                imageCaption: "Siempre se te ocurrian de estas cositas (nunca supe como reaccionar pero las amaba jj)",
-                benefitText: "El cupón de hoy es el beneficio de elegir la próxima peli que vamos a ver (o un video si preferís), de la duración que quieras. Se puede canjear por lo que vos quieras para nuestro próximo rato juntos.",
+                id: 4, dayName: "Miércoles", title: "Por hacerme sentir especial", isUnlocked: true, icon: "fa-gem",
+                text: "Desde el comienzo, con cada uno de tus detallitos, de tus ocurrencias me hiciste sentir especial de a poco. Gracias por todo lo que me diste y me das, te amo muchisisisimo mi vida.",
+                imageUrl: "fotoMiercoles.jpg", imageCaption: "Siempre se te ocurrian de estas cositas",
+                benefitText: "El cupón de hoy es el beneficio de elegir la próxima peli que vamos a ver (o un video si preferís).",
             },
             {
-                id: 5,
-                dayName: "Jueves",
-                title: "Sencillamente por ser hermosa",
-                isUnlocked: true,
-                icon: "fa-solid fa-wand-sparkles",
-                text: "Te lo dije mil veces y te podria decir mil veces mas, sos preciosa mi vida, hermosa por donde se te mire y asi me tenes enamorado hace aaañooss, tenes mil cosas lindas pero hoy estoy hablando exclusivamente de tu fisico, de tu mirada, de tu sonrisa, de tu cabello, de piernas, de tu boquita, de tu piel, podria seguir, pero basicamente eso mi vida, sos preciosa y me encanta que seas mia (jjj), te amo mucho mi chiquita hermosa",
-                imageUrl: "fotoJueves.jpg",
-                imageCaption: "Beautyfull",
-                benefitText: "Desbloqueaste 10 halagos para ti que te irán llegando durante el día (que no se te suba la fama e jjj)",
-                actionButton: {
-                    text: "Pedir mis 10 halagos del día ",
-                    url: "https://api.whatsapp.com/send?text=Hola%20mi%20amor%2C%20desbloque%C3%A9%20mis%2010%20halagos%20del%20d%C3%ADa%20para%20mi",
-                    icon: "fa-whatsapp",
-                    colorClass: "bg-[#25D366] hover:bg-[#128C7E] shadow-[0_0_20px_rgba(37,211,102,0.4)]"
-                }
+                id: 5, dayName: "Jueves", title: "Sencillamente por ser hermosa", isUnlocked: true, icon: "fa-wand-sparkles",
+                text: "Te lo dije mil veces y te podria decir mil veces mas, sos preciosa mi vida, hermosa por donde se te mire y asi me tenes enamorado hace aaañooss. Sos preciosa y me encanta que seas mia (jjj).",
+                imageUrl: "fotoJueves.jpg", imageCaption: "Beautyfull",
+                benefitText: "Desbloqueaste 10 halagos para ti que te irán llegando durante el día.",
+                actionButton: { text: "Pedir mis 10 halagos", url: "https://api.whatsapp.com/send?text=Hola%20mi%20amor%2C%20desbloque%C3%A9%20mis%2010%20halagos", icon: "fa-whatsapp", colorClass: "bg-[#25D366] hover:bg-[#128C7E] shadow-[0_0_20px_rgba(37,211,102,0.4)]" }
             },
             {
-                id: 6,
-                dayName: "Viernes",
-                title: "Tu fortaleza y resiliencia",
-                isUnlocked: true,
-                icon: "fa-solid fa-hand-fist",
-                text: "Siempre voy a admirar tu fortaleza y resiliencia mi vida, siempre que tuviste obstaculos, siempre que algo se puso en tu camino supiste como afrontarlo y continuar con lo que vos querias hacer, me lo demostraste una y otra vez que siempre que querias podias, ya te lo dije varias veces pero te lo vuelvo a decir, podes con tooodo lo que te propongas hacer, siempre fue asi, te amo y admiro muuuchiiisimo",
-                imageUrl: "fotoViernes.jpeg",
-                imageCaption: "mitati feliz probando achilata en tucuman",
-                actionButton: {
-                    text: "Código: YSTVA (Tocá para guardarlo en tatiesa)",
-                    url: "https://api.whatsapp.com/send?text=Felicidades%21%21%20ganaste%20otro%20cupon%20para%20un%20regalo%20sorpresa%2C%20ya%20llevas%202%2C%20guardalo%20bien%20%F0%9F%98%8A%0ACodigo%3A%20YSTVAA",
-                    // Un color dorado/naranja degradado para que parezca un ticket real
-                    colorClass: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 shadow-[0_0_20px_rgba(245,158,11,0.4)]"
-                }
+                id: 6, dayName: "Viernes", title: "Tu fortaleza y resiliencia", isUnlocked: true, icon: "fa-hand-fist",
+                text: "Siempre voy a admirar tu fortaleza y resiliencia mi vida, siempre que tuviste obstaculos supiste como afrontarlo y continuar. Te admiro muuuchiiisimo.",
+                imageUrl: "fotoViernes.jpeg", imageCaption: "mitati feliz probando achilata en tucuman",
+                actionButton: { text: "Código: YSTVA", url: "https://api.whatsapp.com/send?text=Codigo%3A%20YSTVAA", colorClass: "bg-gradient-to-r from-amber-500 to-orange-500 shadow-[0_0_20px_rgba(245,158,11,0.4)]" }
             },
             {
-                id: 7,
-                dayName: "Sábado",
-                title: "Porque sos mi lugar seguro",
-                isUnlocked: true,
-                icon: "fa-house-chimney",
-                text: "Una de las razones mas fuertes para amarte es lo seguro que me haces sentir cuando estoy con vos, siento que nada me juzga puedo ser yo, el unico lugar al que quiero correr cuando estoy feliz, triste o meh, me haces muy muy bien amorcito mio, y despues de todo te sigo sintiendo como mi lugar seguro, gracias por eso mi vida. TE AMOOO.",
-                imageUrl: "imagenSabado.jpeg",
-                imageCaption: "foto iconicc pero ahi si me sentia en casita jj",
-                coupon: {
-                    placeholder: "Escribí el tatibeneficio que quieras aquí y sacale screenshot para mandármelo por wpp."
-                }
+                id: 7, dayName: "Sábado", title: "Porque sos mi lugar seguro", isUnlocked: true, icon: "fa-house-chimney",
+                text: "Una de las razones mas fuertes para amarte es lo seguro que me haces sentir cuando estoy con vos, siento que nada me juzga puedo ser yo, me haces muy muy bien amorcito mio. TE AMOOO.",
+                imageUrl: "imagenSabado.jpeg", imageCaption: "foto iconicc pero ahi si me sentia en casita jj",
+                coupon: { placeholder: "Escribí el tatibeneficio que quieras aquí y sacale screenshot para mandármelo por wpp." }
             },
             {
-                id: 8,
-                dayName: "Domingo",
-                title: "Razon Domingo",
-                isUnlocked: false,
-                icon: "fa-infinity",
-                text: "Simplemente te amo por ser quien eres. Con tus virtudes y tus defectos. Eres la pieza que le faltaba a mi rompecabezas. Te elijo hoy y todos los días de mi vida.",
-                imageUrl: "https://placehold.co/600x600/2c5364/FFFFFF?text=Foto+Sabado",
-                imageCaption: "Te amo infinitamente"
+                id: 8, 
+                dayName: "Domingo", 
+                title: "Porque sos el amor de mi vida", 
+                isUnlocked: true, 
+                isSpecial: true, 
+                icon: "fa-heart", 
+                text: "Llegamos al final de esta semanita mivida. Y de todas las razones que te di, esta es la más fuerte y la más real te amo porque sos el amor de mi vida. Quizas seguimos siendo chicos como para adelantarnos tanto y todavia nos falta vivir mucho pero por todo lo que te conozco hasta hoy, quiero que seas vos\n\nPorque con nuestras cosas buenas y nuestras cosas malas encajás perfecto conmigo. Porque pensar en mi futuro es imaginarte a vos al lado mío o logrando cosas con vos al lado mio. Gracias por ser siemmpre mi compañera incondicional, mi lugar seguro y muchas veces mi razon para estar feli.\n\nPorque a pesar de todos los obstaculos que tuvimos y de la distancia actual, a pesar de miles de cosas, seguimos aqui juntitos intentando lograr algo entre nosotros.\n\nTe digo que quiero que seas vos y te elijo hoy y te quiero a elegir todos los días de mi vida. y preparate, porque cuando estos 300km se hagan 0 porfin, te voy a llenar de besos, abrazos, y todo lo que vos quieras.\n\nTe amo infinitamente con tooodo mi corazoncito. Siempre tuyo. Tu Mati",
+                imageUrl: "fotoDomingo.png", 
+                imageCaption: "Te elijo hoy y todos los días de mi vida."
             }
         ];
 
@@ -267,30 +212,45 @@
         const modalContent = document.getElementById('modalContent');
         const couponContainer = document.getElementById('modalCouponContainer');
         const couponInput = document.getElementById('couponInput');
+        let typeWriterInterval;
 
-        // Renderizar las tarjetas
         function renderDays() {
             grid.innerHTML = '';
             daysData.forEach((day, index) => {
                 const isLocked = !day.isUnlocked;
-                // Retraso de animación para efecto en cascada
                 const animationDelay = index * 0.1;
                 
+                let cardBaseStyles = '';
+                let iconStyles = '';
+
+                if (isLocked) {
+                    cardBaseStyles = 'bg-slate-800/60 border border-slate-700 opacity-70 grayscale-[50%] backdrop-blur-sm';
+                    iconStyles = 'bg-slate-700 text-slate-500';
+                } else {
+                    if (day.isSpecial) {
+                        cardBaseStyles = 'bg-slate-900 border-2 border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.5)] cursor-pointer hover:scale-105 animate-[pulse_2.5s_ease-in-out_infinite]';
+                        iconStyles = 'bg-gradient-to-r from-amber-500 to-rose-600 text-white shadow-[0_0_25px_rgba(225,29,72,0.7)] text-3xl';
+                    } else {
+                        cardBaseStyles = 'bg-slate-800/70 border border-teal-500/40 cursor-pointer card-glow hover:-translate-y-2 floating backdrop-blur-sm';
+                        iconStyles = 'bg-teal-900/50 text-teal-300 shadow-[0_0_15px_rgba(45,212,191,0.5)]';
+                    }
+                }
+
                 const card = document.createElement('div');
-                card.className = `relative rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all duration-300 ${isLocked ? 'bg-slate-800/50 border border-slate-700 opacity-70 grayscale-[50%]' : 'bg-slate-800/80 border border-teal-500/40 cursor-pointer card-glow hover:-translate-y-2 floating'}`;
-                card.style.animationDelay = `${animationDelay}s`;
+                card.className = `relative rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all duration-300 ${cardBaseStyles}`;
+                if(!day.isSpecial) card.style.animationDelay = `${animationDelay}s`;
                 
                 if (!isLocked) {
                     card.onclick = () => openModal(day.id);
                 }
 
                 card.innerHTML = `
-                    <div class="w-16 h-16 rounded-full mb-4 flex items-center justify-center ${isLocked ? 'bg-slate-700 text-slate-500' : 'bg-teal-900/50 text-teal-300 shadow-[0_0_15px_rgba(45,212,191,0.5)]'}">
-                        <i class="fa-solid ${isLocked ? 'fa-lock' : day.icon} text-2xl"></i>
+                    <div class="w-16 h-16 rounded-full mb-4 flex items-center justify-center ${iconStyles}">
+                        <i class="fa-solid ${isLocked ? 'fa-lock' : day.icon} ${day.isSpecial ? 'text-3xl' : 'text-2xl'}"></i>
                     </div>
-                    <h3 class="text-xl font-serif text-teal-50 mb-1">${day.dayName}</h3>
-                    <p class="text-sm ${isLocked ? 'text-slate-500' : 'text-teal-300 font-medium'}">
-                        ${isLocked ? 'Todavia no e, confianzuuda, pasiensia pasiensa' : '¡Toca para abrir!'}
+                    <h3 class="text-xl font-serif ${day.isSpecial ? 'text-amber-100 font-bold' : 'text-teal-50'} mb-1">${day.dayName}</h3>
+                    <p class="text-sm ${isLocked ? 'text-slate-400' : (day.isSpecial ? 'text-amber-400 font-semibold uppercase tracking-wider' : 'text-teal-200 font-medium')}">
+                        ${isLocked ? 'Todavia no e, confianzuuda' : (day.isSpecial ? 'Toca para abrir' : '¡Toca para abrir!')}
                     </p>
                 `;
                 
@@ -298,31 +258,97 @@
             });
         }
 
-        // Función para abrir la tarjeta corregida (aquí estaba el error)
+        function setRomanticTheme(isRomantic) {
+            const modalDate = document.getElementById('modalDate');
+            const quoteIcons = document.querySelectorAll('.quote-icon');
+            const polaroidFrame = document.getElementById('polaroidFrame');
+
+            if (isRomantic) {
+                document.body.style.background = 'linear-gradient(to bottom, #4c0519, #831843, #2e020f)'; 
+                modalContent.classList.remove('border-teal-500/30', 'shadow-[0_0_50px_rgba(20,184,166,0.15)]');
+                modalContent.classList.add('border-rose-500/50', 'shadow-[0_0_60px_rgba(225,29,72,0.3)]');
+                modalDate.classList.remove('from-teal-100', 'to-teal-300');
+                modalDate.classList.add('from-rose-200', 'to-rose-400');
+                quoteIcons.forEach(icon => {
+                    icon.classList.remove('text-teal-500/20');
+                    icon.classList.add('text-rose-500/30');
+                });
+                polaroidFrame.classList.replace('border-white', 'border-rose-50');
+            } else {
+                document.body.style.background = ''; 
+                modalContent.classList.add('border-teal-500/30', 'shadow-[0_0_50px_rgba(20,184,166,0.15)]');
+                modalContent.classList.remove('border-rose-500/50', 'shadow-[0_0_60px_rgba(225,29,72,0.3)]');
+                modalDate.classList.add('from-teal-100', 'to-teal-300');
+                modalDate.classList.remove('from-rose-200', 'to-rose-400');
+                quoteIcons.forEach(icon => {
+                    icon.classList.add('text-teal-500/20');
+                    icon.classList.remove('text-rose-500/30');
+                });
+                polaroidFrame.classList.replace('border-rose-50', 'border-white');
+            }
+        }
+
+        function startTypewriter(text, elementId, speed = 45) {
+            const el = document.getElementById(elementId);
+            el.innerText = '';
+            el.classList.add('typing-cursor');
+            
+            let i = 0;
+            typeWriterInterval = setInterval(() => {
+                if (i < text.length) {
+                    el.innerText += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typeWriterInterval);
+                    el.classList.remove('typing-cursor');
+                }
+            }, speed);
+        }
+
         function openModal(dayId) {
             const day = daysData.find(d => d.id === dayId);
             if (!day) return;
 
-            // Llenar datos en el HTML
+            clearInterval(typeWriterInterval);
+            document.getElementById('modalText').classList.remove('typing-cursor');
+            
+            const audio = document.getElementById('bgMusic');
+            audio.pause();
+            audio.currentTime = 0;
+
             document.getElementById('modalDayTitle').innerText = day.dayName;
             document.getElementById('modalDate').innerText = day.title;
             document.getElementById('modalImage').src = day.imageUrl;
             document.getElementById('modalImageCaption').innerText = day.imageCaption;
-            document.getElementById('modalText').innerText = day.text;
 
-            // Manejar el botón de acción (WhatsApp)
+            if (day.isSpecial) {
+                setRomanticTheme(true);
+                audio.play().catch(e => console.log("Navegador bloqueó el autoplay de audio", e));
+
+                confetti({
+                    particleCount: 200,
+                    spread: 120,
+                    origin: { y: 0.6 },
+                    colors: ['#fbbf24', '#f43f5e', '#ffffff', '#e11d48'] 
+                });
+
+                document.getElementById('modalText').innerText = ''; 
+                setTimeout(() => {
+                    startTypewriter(day.text, 'modalText', 45); 
+                }, 500);
+
+            } else {
+                setRomanticTheme(false);
+                document.getElementById('modalText').innerText = day.text;
+            }
+
             const actionContainer = document.getElementById('modalActionContainer');
             if (day.actionButton) {
                 const actionBtn = document.getElementById('modalActionButton');
                 actionBtn.href = day.actionButton.url;
-                
-                // Limpiar clases previas de color y asignar las de la configuración
                 actionBtn.className = `inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-white font-medium text-lg transition-all hover:scale-105 shadow-lg w-full sm:w-auto ${day.actionButton.colorClass}`;
-                
                 document.getElementById('modalActionText').innerText = day.actionButton.text;
                 document.getElementById('modalActionIcon').className = `fa-brands ${day.actionButton.icon} text-2xl`;
-                
-                // Mostrar contenedor
                 actionContainer.classList.remove('hidden');
                 actionContainer.classList.add('flex');
             } else {
@@ -345,7 +371,6 @@
                 couponContainer.classList.add('hidden');
             }
 
-            // Mostrar el modal con animación suave
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
@@ -354,74 +379,114 @@
             }, 10);
         }
         
-        function closeWelcomeModal() { //ESTA FUNCION LA DEJO PQ SINO SE ROMPE TODO YA VOY A VER Q ONDA
-            const wModal = document.getElementById('welcomeModal');
-            wModal.classList.add('opacity-0');
-            setTimeout(() => {
-                wModal.classList.add('hidden');
-            }, 300);
-        }
-        
         function closeModal() {
+            clearInterval(typeWriterInterval);
             modal.classList.add('opacity-0');
             modalContent.classList.remove('scale-100');
             modalContent.classList.add('scale-95');
+            
             setTimeout(() => {
                 modal.classList.add('hidden');
+                setRomanticTheme(false);
+                const audio = document.getElementById('bgMusic');
+                let vol = audio.volume;
+                let fade = setInterval(() => {
+                    if (vol > 0.1) {
+                        vol -= 0.1;
+                        audio.volume = vol;
+                    } else {
+                        clearInterval(fade);
+                        audio.pause();
+                        audio.volume = 1; 
+                    }
+                }, 50);
             }, 300);
         }
 
-        // --- LÓGICA DEL FONDO DE ESTRELLAS (CANVAS) ---
+        // --- NUEVA LÓGICA DEL CANVAS: Polvo de Hadas / Luciérnagas Mágicas ---
         const canvas = document.getElementById('starsCanvas');
         const ctx = canvas.getContext('2d');
-        let stars = [];
+        let particles = [];
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            initStars();
+            initParticles();
         }
 
-        function initStars() {
-            stars = [];
-            const numStars = Math.floor((canvas.width * canvas.height) / 3000); // Densidad de estrellas
-            for (let i = 0; i < numStars; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    radius: Math.random() * 1.5 + 0.5,
-                    alpha: Math.random(),
-                    speed: Math.random() * 0.02 + 0.005,
-                    color: Math.random() > 0.8 ? '#67e8f9' : '#ffffff' // Algunas estrellas celestes
-                });
+        // Crea una partícula mágica (Luciérnaga / Polvo de hadas)
+        function createMagicParticle(isInitial = false) {
+            let xPos = Math.random() * canvas.width;
+            return {
+                baseX: xPos,                 // Punto de origen para el zig-zag
+                x: xPos,
+                // Si es inicial, aparece por toda la pantalla. Si es nueva, nace abajo.
+                y: isInitial ? Math.random() * canvas.height : canvas.height + 20,
+                radius: Math.random() * 2 + 1, // Tamaño suave
+                speedY: Math.random() * 0.4 + 0.1, // SÚPER lento hacia arriba (muy cute)
+                angle: Math.random() * Math.PI * 2, // Ángulo para el seno
+                angleSpeed: Math.random() * 0.015 + 0.005, // Velocidad de oscilación (zig-zag)
+                wobble: Math.random() * 20 + 5, // Amplitud del zig-zag
+                alpha: Math.random(),
+                speedAlpha: Math.random() * 0.02 + 0.005, // Velocidad de titileo
+                // Colores cálidos y románticos
+                color: Math.random() > 0.6 ? '#fde047' : (Math.random() > 0.3 ? '#fbcfe8' : '#ffffff')
+            };
+        }
+
+        function initParticles() {
+            particles = [];
+            // Menos partículas para que se vea elegante y no saturado
+            const numParticles = Math.floor((canvas.width * canvas.height) / 4500);
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(createMagicParticle(true));
             }
         }
 
-        function animateStars() {
+        function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            stars.forEach(star => {
-                // Hacer que titilen
-                star.alpha += star.speed;
-                if (star.alpha > 1 || star.alpha < 0) {
-                    star.speed = -star.speed;
-                }
+            particles.forEach((p, index) => {
+                // Oscilación matemática (seno) para que vaya de lado a lado orgánicamente
+                p.angle += p.angleSpeed;
+                p.x = p.baseX + Math.sin(p.angle) * p.wobble;
                 
+                // Movimiento muy lento hacia arriba
+                p.y -= p.speedY;
+
+                // Titileo suave
+                p.alpha += p.speedAlpha;
+                if (p.alpha > 1 || p.alpha < 0) {
+                    p.speedAlpha = -p.speedAlpha;
+                }
+
+                // Dibujamos la partícula con un resplandor (glow)
                 ctx.beginPath();
-                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-                ctx.fillStyle = star.color;
-                ctx.globalAlpha = Math.abs(star.alpha);
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.abs(p.alpha) * 0.8; // Nunca es 100% sólida, es suave
+                
+                // Le agregamos luz a su alrededor
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = p.color;
                 ctx.fill();
+                
+                // Reseteamos la sombra para no romper otros dibujos
+                ctx.shadowBlur = 0;
+
+                // Si sale por la parte de arriba de la pantalla, vuelve a nacer abajo
+                if (p.y < -20) {
+                    particles[index] = createMagicParticle(false);
+                }
             });
-            
-            requestAnimationFrame(animateStars);
+            requestAnimationFrame(animateParticles);
         }
 
-        // Calcula la próxima medianoche local y muestra el día siguiente
+        // Funciones del contador
         function getNextUnlockedDayInfo() {
             const now = new Date();
             const targetDate = new Date(now);
-            targetDate.setHours(24, 0, 0, 0); // la próxima medianoche local
+            targetDate.setHours(24, 0, 0, 0);
 
             const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
             const nextDayName = dayNames[targetDate.getDay()];
@@ -431,10 +496,7 @@
                 return { label: 'Ya está todo desbloqueado', target: null };
             }
 
-            return {
-                label: `Cuenta regresiva para ${nextDayName} (00:00)`,
-                target: targetDate
-            };
+            return { label: `Cuenta regresiva para ${nextDayName} (00:00)`, target: targetDate };
         }
 
         function formatCountdown(ms) {
@@ -457,31 +519,23 @@
                 return;
             }
 
-            const now = new Date();
-            const diff = info.target - now;
+            const diff = info.target - new Date();
             countdownTimer.textContent = formatCountdown(diff);
-
-            if (diff <= 0) {
-                // Forzar re-render si el día cambió justo a medianoche
-                renderDays();
-            }
         }
 
-        // Iniciar todo al cargar
         window.addEventListener('resize', resizeCanvas);
         window.onload = function() {
             resizeCanvas();
-            animateStars();
+            // Invocamos la nueva función de partículas
+            animateParticles();
             renderDays();
             updateCountdown();
             setInterval(updateCountdown, 1000);
         };
 
-        // Cerrar modal si hacen click fuera de él
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
         });
-
     </script>
 </body>
 </html>
